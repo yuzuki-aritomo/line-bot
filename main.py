@@ -3,6 +3,9 @@ from linebot import LineBotApi,WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent,TextMessage,TextSendMessage,TemplateSendMessage,ButtonsTemplate,MessageAction
 import os
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker 
+from models import User
 
 app=Flask(__name__)
 
@@ -12,6 +15,10 @@ YOUR_CHANNEL_SECRET = os.environ["YOUR_CHANNEL_SECRET"]
 
 line_bot_api = LineBotApi(YOUR_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(YOUR_CHANNEL_SECRET)
+
+# test.db (DB) と連結するための object である engine を作り、DB を session に代入する。
+engine = create_engine('sqlite:///linebot.db')
+session = sessionmaker(bind=engine)()
 
 @app.route("/")
 def hello_world():
@@ -38,7 +45,7 @@ def response_message(event):
     if status_msg != "None":
         # LINEに登録されているstatus_messageが空の場合は、"なし"という文字列を代わりの値とする
         status_msg = "なし"
-
+    
     messages = TemplateSendMessage(alt_text="Buttons template",
                                     template=ButtonsTemplate(
                                         thumbnail_image_url=profile.picture_url,
@@ -46,6 +53,13 @@ def response_message(event):
                                         text=f"User Id: {profile.user_id[:5]}...\n"
                                             f"Status Message: {status_msg}",
                                         actions=[MessageAction(label="成功", text="次は何を実装しましょうか？")]))
+
+    #データベースに保存
+    name = profile.display_name
+    user_id = profile.user_id8
+    new_user = User(name=name, user_id=user_id)
+    session.add(new_user)
+    session.commit()
 
     line_bot_api.reply_message(event.reply_token, messages=messages)
     # line_bot_api.reply_message(event.reply_token,TextSendMessage(text=event.message.text))
