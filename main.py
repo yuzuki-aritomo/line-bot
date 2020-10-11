@@ -55,8 +55,10 @@ def response_message(event):
                                         actions=[MessageAction(label="成功", text="次は何を実装しましょうか？")]))
 
     #データベースに保存
-    name = profile.display_name
-    user_id = profile.user_id
+    # name = profile.display_name
+    # user_id = profile.user_id
+    name = "master"
+    user_id = "sds00011"
     new_user = User(name=name, user_id=user_id)
     session.add(new_user)
     session.commit()
