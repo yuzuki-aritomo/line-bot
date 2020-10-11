@@ -17,8 +17,10 @@ line_bot_api = LineBotApi(YOUR_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(YOUR_CHANNEL_SECRET)
 
 # test.db (DB) と連結するための object である engine を作り、DB を session に代入する。
-engine = create_engine('sqlite:///linebot.db')
+# engine = create_engine('sqlite:///linebot.db')
+engine = create_engine('postgresql://fkvmwrougwmslh:1a7671b9b51229d5cc0dcd7e1d8b18c3323511a094ae1984e93af0e64f32b407@ec2-52-21-0-111.compute-1.amazonaws.com:5432/d7j3ihuk920d4i')
 session = sessionmaker(bind=engine)()
+
 
 @app.route("/")
 def hello_world():
